@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CssOptimizerU;
+using System;
 
 namespace UteamCssOptimizer
 {
@@ -6,7 +7,9 @@ namespace UteamCssOptimizer
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+
+            CssAnalyzer.Demo();
+            Console.ReadLine();
         }
     }
 }
