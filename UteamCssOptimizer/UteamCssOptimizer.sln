@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31019.35
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UteamCssOptimizer", "UteamCssOptimizer\UteamCssOptimizer.csproj", "{DBCC3480-7216-4AD1-8504-52DDAD0FE9AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CssOptimizerU", "CssOptimizerU\CssOptimizerU.csproj", "{D9A9D5C0-9E58-4306-9828-60BB0140796E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DBCC3480-7216-4AD1-8504-52DDAD0FE9AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBCC3480-7216-4AD1-8504-52DDAD0FE9AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBCC3480-7216-4AD1-8504-52DDAD0FE9AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBCC3480-7216-4AD1-8504-52DDAD0FE9AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9A9D5C0-9E58-4306-9828-60BB0140796E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9A9D5C0-9E58-4306-9828-60BB0140796E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9A9D5C0-9E58-4306-9828-60BB0140796E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9A9D5C0-9E58-4306-9828-60BB0140796E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {59C76F97-6E34-4200-9F99-B00080672733}
+	EndGlobalSection
+EndGlobal
