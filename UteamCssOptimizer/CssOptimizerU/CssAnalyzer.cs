@@ -82,19 +82,49 @@ namespace CssOptimizerU
 
 
 
+                //var config = Configuration.Default.WithDefaultLoader(new LoaderOptions { IsResourceLoadingEnabled = true }).WithCss();
+                //var context = BrowsingContext.New(config);
+                //var address = "http://www.example.com"; // any reason for dropping the protocol?
+                //var document = await context.OpenAsync(address);
+                //var sheet = document.QuerySelector<IHtmlLinkElement>("link[rel=stylesheet]")?.Sheet;
+
+
                 var cssFile = await BrowsingContext.New(config).OpenAsync($"{address}/{linkToFile}");
                 CssParser cssParser = new CssParser();
                 var sheet = await cssParser.ParseStyleSheetAsync(cssFile.Source.Text);
+
+                Console.WriteLine(sheet.Rules.Length);
+                int count = 0;
                
-                foreach (var rule in sheet.Rules) {
+                foreach ( var rule in sheet.Rules.Where(x=>x.Type == CssRuleType.Style)) {
 
-                    Console.WriteLine(((ICssStyleRule)rule).Selector.Text);
+                    //if (rule is ICssFontFaceRule)
+                    //{
+                    //    Console.WriteLine(((ICssFontFaceRule)rule).Family);
+                    //    Console.WriteLine($"+++++++++  - {++count}");
+                    //}
+                     
+                    //if (rule is ICssCharsetRule)
+                    //{
+                    //    Console.WriteLine(((ICssCharsetRule)rule).CssText);
+                    //    Console.WriteLine($"+++++++++  - {++count}");
+                    //}
+
+                    if (rule is ICssPageRule)
+                    {
+                        Console.WriteLine(((ICssPageRule)rule).SelectorText);
+                        Console.WriteLine($"+++++++++  - {++count}");
+                    }
+
+                    if (rule is ICssStyleRule) {
+
+                        Console.WriteLine(((ICssStyleRule)rule).SelectorText);
+                        Console.WriteLine($"+++++++++  - {++count}");
+                    }
+
+
                 }
-
-
             }
-
-
         }
     }
 }
