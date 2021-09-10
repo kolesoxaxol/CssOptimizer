@@ -94,7 +94,8 @@ namespace CssOptimizerU
                 var sheet = await cssParser.ParseStyleSheetAsync(cssFile.Source.Text);
 
                 Console.WriteLine(sheet.Rules.Length);
-                int count = 0;
+                int countCommonSelectors = 0;
+                int countUsedSelectors = 0;
                
                 foreach ( var rule in sheet.Rules.Where(x=>x.Type == CssRuleType.Style)) {
 
@@ -110,20 +111,28 @@ namespace CssOptimizerU
                     //    Console.WriteLine($"+++++++++  - {++count}");
                     //}
 
-                    if (rule is ICssPageRule)
-                    {
-                        Console.WriteLine(((ICssPageRule)rule).SelectorText);
-                        Console.WriteLine($"+++++++++  - {++count}");
-                    }
+                    //if (rule is ICssPageRule)
+                    //{
+                    //    Console.WriteLine(((ICssPageRule)rule).SelectorText);
+                    //    Console.WriteLine($"+++++++++  - {++count}");
+                    //}
 
                     if (rule is ICssStyleRule) {
 
-                        Console.WriteLine(((ICssStyleRule)rule).SelectorText);
-                        Console.WriteLine($"+++++++++  - {++count}");
+                        var selector = ((ICssStyleRule)rule).SelectorText;
+                        if (!string.IsNullOrEmpty(selector))
+                        {
+                            Console.WriteLine($"count elements by query for selector: {selector} -  {document.QuerySelectorAll(selector).Length}");
+                         
+                            Console.WriteLine($"+++++++++  - {++countCommonSelectors}");
+                            if (document.QuerySelectorAll(selector).Length > 0) {
+                                countUsedSelectors++;
+                            }
+                        }
                     }
-
-
                 }
+
+                Console.WriteLine($"used Selectors coount { countUsedSelectors} , used persentage on page is {countUsedSelectors / (countCommonSelectors / 100)}");
             }
         }
     }
