@@ -14,6 +14,7 @@ namespace CssOptimizerU
 {
     public class CssAnalyzer
     {
+       
         public static async Task FirstExample()
         {
             //Use the default configuration for AngleSharp
@@ -198,12 +199,29 @@ namespace CssOptimizerU
 
 
             Console.WriteLine("Parse Css: \n");
-            foreach(var rule in styleCssSheet.Rules)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine(rule.Type);
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine(rule.CssText);
+            ProcessRules(styleCssSheet.Rules);
+        }
+
+
+        private static void ProcessRules(ICssRuleList rules) {
+
+            foreach (var rule in rules) {
+
+                if (rule is ICssGroupingRule)
+                {
+                    ProcessRules(((ICssGroupingRule)rule).Rules);
+                }
+                else
+                {
+                   
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine(rule.Type);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine(rule.CssText);
+                  
+                }
+
+             
             }
         }
     }
