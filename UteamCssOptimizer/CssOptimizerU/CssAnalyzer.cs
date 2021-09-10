@@ -1,7 +1,11 @@
 ﻿using AngleSharp;
 using AngleSharp.Css.Dom;
 using AngleSharp.Css.Parser;
+using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
+using AngleSharp.Io;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -56,8 +60,7 @@ namespace CssOptimizerU
             foreach (var title in titles)
                 Console.WriteLine("* {0}", title.Trim(new[] { '"' }));
         }
-
-        public static async Task Demo()
+        public static async Task Example()
         {
 
             // Setup the configuration to support document loading
@@ -96,15 +99,16 @@ namespace CssOptimizerU
                 Console.WriteLine(sheet.Rules.Length);
                 int countCommonSelectors = 0;
                 int countUsedSelectors = 0;
-               
-                foreach ( var rule in sheet.Rules.Where(x=>x.Type == CssRuleType.Style)) {
+
+                foreach (var rule in sheet.Rules.Where(x => x.Type == CssRuleType.Style))
+                {
 
                     //if (rule is ICssFontFaceRule)
                     //{
                     //    Console.WriteLine(((ICssFontFaceRule)rule).Family);
                     //    Console.WriteLine($"+++++++++  - {++count}");
                     //}
-                     
+
                     //if (rule is ICssCharsetRule)
                     //{
                     //    Console.WriteLine(((ICssCharsetRule)rule).CssText);
@@ -117,15 +121,17 @@ namespace CssOptimizerU
                     //    Console.WriteLine($"+++++++++  - {++count}");
                     //}
 
-                    if (rule is ICssStyleRule) {
+                    if (rule is ICssStyleRule)
+                    {
 
                         var selector = ((ICssStyleRule)rule).SelectorText;
                         if (!string.IsNullOrEmpty(selector))
                         {
                             Console.WriteLine($"count elements by query for selector: {selector} -  {document.QuerySelectorAll(selector).Length}");
-                         
+
                             Console.WriteLine($"+++++++++  - {++countCommonSelectors}");
-                            if (document.QuerySelectorAll(selector).Length > 0) {
+                            if (document.QuerySelectorAll(selector).Length > 0)
+                            {
                                 countUsedSelectors++;
                             }
                         }
@@ -133,6 +139,71 @@ namespace CssOptimizerU
                 }
 
                 Console.WriteLine($"used Selectors coount { countUsedSelectors} , used persentage on page is {countUsedSelectors / (countCommonSelectors / 100)}");
+            }
+        }
+
+        public static async Task Demo()
+        {
+            var config = Configuration.Default.WithDefaultLoader(new LoaderOptions { IsResourceLoadingEnabled = true }).WithCss();
+            var context = BrowsingContext.New(config);
+            var address = "http://corona.uteam-dev.com/";
+            var document = await context.OpenAsync(address);
+
+            var sheets = GetAllCssFiles(document);
+
+            Console.WriteLine("All css file on the page:\n");
+            foreach (var styleSheet in sheets)
+            {
+                Console.WriteLine(styleSheet.Href);
+            }
+
+            var sheet = sheets.FirstOrDefault(sh => sh.Href.Contains("general.css"));
+
+            Console.WriteLine();
+            Console.WriteLine("+++++++++++++++++ Analyze general.css ++++++++++++++++++++++++++++++++++ :\n");
+            AnalyzeDocStyles(document, sheet);
+
+            Console.ReadLine();
+        }
+
+
+        private static IEnumerable<IStyleSheet> GetAllCssFiles(IDocument document)
+        {
+
+            List<IStyleSheet> sheets = new List<IStyleSheet>();
+            var links = document.QuerySelectorAll("link[rel=stylesheet]");
+
+            foreach (var fileLink in links)
+            {
+                var sheet = ((IHtmlLinkElement)fileLink)?.Sheet;
+
+                if (sheet != null)
+                {
+                    sheets.Add(sheet);
+                };
+            }
+
+            return sheets;
+        }
+     
+        
+
+        private static async void AnalyzeDocStyles(IDocument document, IStyleSheet sheet) {
+
+            Console.WriteLine();
+            Console.WriteLine();
+
+            CssParser cssParser = new CssParser();
+            var styleCssSheet = await cssParser.ParseStyleSheetAsync(sheet.Source.Text);
+
+
+            Console.WriteLine("Parse Css: \n");
+            foreach(var rule in styleCssSheet.Rules)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine(rule.Type);
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine(rule.CssText);
             }
         }
     }
