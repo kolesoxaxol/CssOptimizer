@@ -14,7 +14,10 @@ namespace CssOptimizerU
 {
     public class CssAnalyzer
     {
-       
+        public static IList<string> selectorsCss = new List<string>();
+
+        public static int selectorCounter;
+
         public static async Task FirstExample()
         {
             //Use the default configuration for AngleSharp
@@ -195,11 +198,16 @@ namespace CssOptimizerU
             Console.WriteLine();
 
             CssParser cssParser = new CssParser();
-            var styleCssSheet = await cssParser.ParseStyleSheetAsync(sheet.Source.Text);
+            if (sheet.Source != null)
+            {
+                var styleCssSheet = await cssParser.ParseStyleSheetAsync(sheet.Source.Text);
 
-
-            Console.WriteLine("Parse Css: \n");
-            ProcessRules(styleCssSheet.Rules);
+                Console.WriteLine("Parse Css: \n");
+                ProcessRules(styleCssSheet.Rules);
+            }
+            else {
+                Console.WriteLine("sheet.Source is null");
+            }
         }
 
 
@@ -218,11 +226,17 @@ namespace CssOptimizerU
                     Console.WriteLine(rule.Type);
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.WriteLine(rule.CssText);
-                  
-                }
+                    selectorCounter++;
 
-             
+                    if (rule is ICssStyleRule) {
+
+                        selectorsCss.Add(((ICssStyleRule)rule).SelectorText);
+                    }
+                }           
             }
+
+            Console.WriteLine(selectorsCss.Count);
+            Console.WriteLine(selectorCounter);
         }
     }
 }
