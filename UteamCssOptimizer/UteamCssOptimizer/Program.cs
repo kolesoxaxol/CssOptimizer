@@ -9,6 +9,9 @@ namespace UteamCssOptimizer
         {
 
             CssAnalyzer.Demo();
+
+
+
             Console.ReadLine();
         }
     }
