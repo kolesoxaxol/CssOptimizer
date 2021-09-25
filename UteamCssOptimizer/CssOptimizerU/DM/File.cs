@@ -4,9 +4,10 @@ using System.Text;
 
 namespace CssOptimizerU.DM
 {
-    public class File
+    public class File : BaseEntity
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public Selector Selector { get; set; }
     }
 }
