@@ -8,8 +8,8 @@ namespace UteamCssOptimizer
     {
         static void Main(string[] args)
         {
-
-            CssAnalyzer.Demo();
+            var address = "http://corona.uteam-dev.com/";
+            var cssUsingData = CssAnalyzer.AnalyzePage(address);
 
             IConfiguration configuration = new ConfigurationBuilder()
               .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
@@ -21,7 +21,7 @@ namespace UteamCssOptimizer
             var connectionString = configuration.GetConnectionString("DefaultConnection");
 
             using (var context = new CssAnalyzerContext("Server=localhost\\SQLEXPRESS; Database=UteamCssAnalyzer; Trusted_Connection=True; MultipleActiveResultSets=true"))
-            {
+            { 
                 context.SaveChanges();
             }
 

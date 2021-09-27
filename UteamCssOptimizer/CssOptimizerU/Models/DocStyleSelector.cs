@@ -1,0 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace CssOptimizerU.Models
+{
+    public class DocStyleSelector
+    {
+        public string Name { get; set; }
+        public string Content { get; set; }
+        public string ConditionText { get; set; }
+        public string FullRuleText { get; set; }
+    }
+}
