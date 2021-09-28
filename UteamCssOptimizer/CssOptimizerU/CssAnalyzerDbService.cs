@@ -46,9 +46,24 @@ namespace CssOptimizerU
                         };
 
                         context.Selector.Add(cssSelector);
+
+                        if (selector.IsUsed)
+                        {
+
+                            DM.Usage usage = new DM.Usage
+                            {
+                                CreatedDate = DateTime.Now,
+                                UpdateDate = DateTime.Now,
+                                PageUrl = cssUsingData.PageUrl,
+                                Selector = cssSelector
+                            };
+
+                            context.Usages.Add(usage);
+                        }
                     }
 
                 }
+
                 context.SaveChanges();
             }
 

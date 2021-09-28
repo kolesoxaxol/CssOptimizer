@@ -153,6 +153,7 @@ namespace CssOptimizerU
                     if (usingCount > 0) {
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         usageDocStyle.Selectors.Add(selector);
+                        selector.IsUsed = true;
                        
                     }
                     else {
