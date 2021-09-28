@@ -39,11 +39,7 @@ namespace CssOptimizerU
             CssUsingDataModel cssUsingData = new CssUsingDataModel();
             cssUsingData.PageUrl = pageUrl;
             cssUsingData.DocStyles.Add(docStyleData);
-
-
             cssUsingData = CollectUsageStatistic(document, cssUsingData);
-
-            Console.ReadLine();
 
             return cssUsingData;
         }

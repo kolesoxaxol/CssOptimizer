@@ -14,17 +14,11 @@ namespace CssOptimizerU
         public DbSet<Usage> Usages { get; set; }
 
 
-        private readonly string _connectionString;
-
-        public CssAnalyzerContext(string connectionString)
+        public CssAnalyzerContext(DbContextOptions<CssAnalyzerContext> options) :base(options)
         {
-            _connectionString = connectionString;
+            Database.EnsureCreated();
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(_connectionString);
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
