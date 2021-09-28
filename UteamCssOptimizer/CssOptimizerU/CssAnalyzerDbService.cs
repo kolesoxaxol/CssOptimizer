@@ -27,10 +27,27 @@ namespace CssOptimizerU
 
             using (var context = new CssAnalyzerContext(_options))
             {
-
                 foreach (var docStyle in cssUsingData.DocStyles)
                 {
-                    context.Files.Add(new DM.File { CreatedDate = DateTime.Now, Name = docStyle.FileName, UpdateDate = DateTime.Now });
+                    var file = new DM.File { CreatedDate = DateTime.Now, Name = docStyle.FileName, UpdateDate = DateTime.Now };
+                    context.Files.Add(file);
+
+                    foreach (var selector in docStyle.Selectors)
+                    {
+                        var cssSelector = new DM.Selector
+                        {
+                            CreatedDate = DateTime.Now,
+                            UpdateDate = DateTime.Now,
+                            Content = selector.Content,
+                            FullRuleText = selector.FullRuleText,
+                            ConditionText = selector.ConditionText,
+                            Name = selector.Name,
+                            File = file
+                        };
+
+                        context.Selector.Add(cssSelector);
+                    }
+
                 }
                 context.SaveChanges();
             }

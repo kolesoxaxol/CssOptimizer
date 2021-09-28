@@ -9,10 +9,8 @@ namespace CssOptimizerU.DM
         public int Id { get; set; }
         public string Name { get; set; }
         public string Content { get; set; }
-        public string GroupId { get; set; }
-        public string MediaQuery { get; set; }
+        public string ConditionText { get; set; }
         public string FullRuleText { get; set; }
-        public int FileId { get; set; }
         public File File { get; set; }
         public Usage Usage { get; set; }
     }

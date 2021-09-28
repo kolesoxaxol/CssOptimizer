@@ -14,8 +14,9 @@ namespace CssOptimizerU
         public DbSet<Usage> Usages { get; set; }
 
 
-        public CssAnalyzerContext(DbContextOptions<CssAnalyzerContext> options) :base(options)
+        public CssAnalyzerContext(DbContextOptions<CssAnalyzerContext> options) : base(options)
         {
+            Database.EnsureDeleted();
             Database.EnsureCreated();
         }
 
@@ -23,12 +24,13 @@ namespace CssOptimizerU
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<File>()
-            .HasOne(b => b.Selector)
+            .HasMany(b => b.Selectors)
             .WithOne(i => i.File);
 
-            modelBuilder.Entity<Usage>()
-           .HasOne(b => b.Selector)
-           .WithOne(i => i.Usage);
+            modelBuilder.Entity<Selector>()
+           .HasOne(b => b.Usage)
+           .WithOne(i => i.Selector)
+           .HasForeignKey<Usage>(p => p.SelectorId);
 
         }
     }

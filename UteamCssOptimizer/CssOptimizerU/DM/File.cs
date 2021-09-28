@@ -8,6 +8,6 @@ namespace CssOptimizerU.DM
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public Selector Selector { get; set; }
+        public List<Selector> Selectors { get; set; }
     }
 }
