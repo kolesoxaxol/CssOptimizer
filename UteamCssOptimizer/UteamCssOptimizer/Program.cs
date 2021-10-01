@@ -26,10 +26,10 @@ namespace UteamCssOptimizer
             ApplicationSettings settings = new ApplicationSettings();
             configuration.GetSection(ApplicationSettings.ApplicationSettingsSectionName).Bind(settings);
 
-            CssAnalyzerDbService dbServcie = new CssAnalyzerDbService();
+            CssAnalyzerDbService dbServcie = new CssAnalyzerDbService(connectionString);
             dbServcie.SaveCssData(cssUsingData.Result);
 
-            // OptimizeCss here x_optimize.css
+            
             CssOptimizer optimizer = new CssOptimizer(dbServcie);
             optimizer.GenerateOptimizeCssFiles(settings.DestinationPath, address,settings.IgnoreFileCondition);
             Console.ReadLine();
