@@ -9,6 +9,7 @@ namespace CssOptimizerU.DM
         public int Id { get; set; }
         public string PageUrl { get; set; }
         public int SelectorId { get; set; }
-        public Selector Selector { get; set; }
+        public string FileName { get; set; }
+        public Selector Selector { get; set; }       
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace CssOptimizerU
@@ -55,7 +56,8 @@ namespace CssOptimizerU
                                 CreatedDate = DateTime.Now,
                                 UpdateDate = DateTime.Now,
                                 PageUrl = cssUsingData.PageUrl,
-                                Selector = cssSelector
+                                Selector = cssSelector,
+                                FileName = docStyle.FileName
                             };
 
                             context.Usages.Add(usage);
@@ -69,8 +71,12 @@ namespace CssOptimizerU
 
         }
         public List<string> GetCssFileNames(string pageUrl) {
-            return new List<string> { "general.css", "booststap.min.css", "slick.css" };
-        }
+            using (var context = new CssAnalyzerContext(_options))
+            {
+                var fileNames = context.Usages.Where(x => x.PageUrl.Equals(pageUrl)).Select(x=>x.FileName).Distinct().ToList();
 
+                return fileNames;
+            }
+        }
     }
 }
