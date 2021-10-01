@@ -5,15 +5,17 @@ using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Io;
 using CssOptimizerU.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace CssOptimizerU
 {
     public class CssAnalyzer
-    {   
+    {
         public static async Task<CssUsingDataModel> AnalyzePage(string pageUrl)
         {
             var config = Configuration.Default.WithDefaultLoader(new LoaderOptions { IsResourceLoadingEnabled = true }).WithCss();
@@ -29,22 +31,28 @@ namespace CssOptimizerU
             }
 
             var sheet = sheets.FirstOrDefault(sh => sh.Href.Contains(cssFileName));
-
-            Console.WriteLine();
-            Console.WriteLine("+++++++++++++++++ Analyze general.css ++++++++++++++++++++++++++++++++++ :\n");
-
-            var docStyleData = await AnalyzeDocStyles(sheet);
-            docStyleData.FileName = cssFileName;
-
             CssUsingDataModel cssUsingData = new CssUsingDataModel();
-            cssUsingData.PageUrl = pageUrl;
-            cssUsingData.DocStyles.Add(docStyleData);
-            cssUsingData = CollectUsageStatistic(document, cssUsingData);
+            if (sheet != null)
+            {
 
-            return cssUsingData;
+                Console.WriteLine();
+                Console.WriteLine("+++++++++++++++++ Analyze general.css ++++++++++++++++++++++++++++++++++ :\n");
+
+                var docStyleData = await AnalyzeDocStyles(sheet);
+                docStyleData.FileName = cssFileName;
+
+               
+                cssUsingData.PageUrl = pageUrl;
+                cssUsingData.DocStyles.Add(docStyleData);
+                cssUsingData = CollectUsageStatistic(document, cssUsingData);
+
+                return cssUsingData;
+            }
+            else {
+                Console.WriteLine("sheet is empty");
+                return cssUsingData;
+            }
         }
-
-
         private static IEnumerable<IStyleSheet> GetAllCssFiles(IDocument document)
         {
 
@@ -63,9 +71,6 @@ namespace CssOptimizerU
 
             return sheets;
         }
-
-
-
         private static async Task<DocStyle> AnalyzeDocStyles(IStyleSheet sheet)
         {
             DocStyle docStyleData = new DocStyle();
@@ -94,7 +99,7 @@ namespace CssOptimizerU
             return docStyleData;
         }
 
-
+        // TODO: check why conditionText is empty in db
         private static DocStyle ProcessRules(ICssRuleList rules, DocStyle docStyleData, string conditionText = "")
         {
 
@@ -102,15 +107,16 @@ namespace CssOptimizerU
             {
 
                 if (rule is ICssGroupingRule)
-                {                
+                {
                     if (rule is ICssMediaRule)
                     {
                         ICssGroupingRule mediaRule = rule as ICssGroupingRule;
                     }
-                    else {
+                    else
+                    {
                         ICssGroupingRule groupRule = rule as ICssGroupingRule;
                         docStyleData = ProcessRules(groupRule.Rules, docStyleData, ((ICssMediaRule)rule).ConditionText);
-                    }         
+                    }
                 }
                 else
                 {
@@ -119,7 +125,7 @@ namespace CssOptimizerU
                     Console.WriteLine(rule.Type);
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.WriteLine(rule.CssText);
-             
+
 
                     if (rule is ICssStyleRule)
                     {
@@ -129,45 +135,48 @@ namespace CssOptimizerU
                             foreach (var selector in selectorText.Split(','))
                             {
                                 docStyleData.Selectors.Add(new DocStyleSelector { FullRuleText = selectorText, Content = rule.CssText, Name = selector, ConditionText = conditionText });
-                  
+
                             }
                         }
                     }
                 }
             }
 
-   
+
 
             return docStyleData;
         }
-
         private static CssUsingDataModel CollectUsageStatistic(IDocument document, CssUsingDataModel cssUsingDataModel)
         {
-           // TODO: add pseud classes :active :focus logic
+            // TODO: add pseud classes :active :focus logic
             foreach (var docStyle in cssUsingDataModel.DocStyles)
             {
                 DocStyle usageDocStyle = new DocStyle();
-                foreach (var selector in docStyle.Selectors) {
+                foreach (var selector in docStyle.Selectors)
+                {
 
                     var usingCount = document.QuerySelectorAll(selector.Name).Length;
-                    if (usingCount > 0) {
+                    if (usingCount > 0)
+                    {
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         usageDocStyle.Selectors.Add(selector);
                         selector.IsUsed = true;
-                       
+
                     }
-                    else {
+                    else
+                    {
                         Console.ForegroundColor = ConsoleColor.Gray;
                     }
-                   
+
                     Console.WriteLine($"count elements by query for selector: {selector.Name} -  {usingCount}");
                 }
 
-                if (usageDocStyle.Selectors.Any()) {
+                if (usageDocStyle.Selectors.Any())
+                {
                     usageDocStyle.FileName = docStyle.FileName;
                     cssUsingDataModel.UsageStyles.Add(usageDocStyle);
                 }
-                
+
             }
 
             return cssUsingDataModel;

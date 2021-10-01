@@ -68,6 +68,9 @@ namespace CssOptimizerU
             }
 
         }
+        public List<string> GetCssFileNames(string pageUrl) {
+            return new List<string> { "general.css", "booststap.min.css", "slick.css" };
+        }
 
     }
 }
