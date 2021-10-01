@@ -7,16 +7,16 @@ namespace CssOptimizerU
 {
     public class CssOptimizer
     {
-        private readonly CssAnalyzerDbService _dbAnalyzeSrvice;
-        public CssOptimizer(CssAnalyzerDbService dbAnalyzeSrvice) {
+        private readonly CssAnalyzerDbService _dbAnalyzeService;
+        public CssOptimizer(CssAnalyzerDbService dbAnalyzeService) {
 
-            _dbAnalyzeSrvice = dbAnalyzeSrvice;
+            _dbAnalyzeService = dbAnalyzeService;
         }
 
         public async void GenerateOptimizeCssFiles(string destinationPath, string pageUrl, string ignoreList)
         {
 
-            var fileList = _dbAnalyzeSrvice.GetCssFileNames(pageUrl);
+            var fileList = _dbAnalyzeService.GetCssFileNames(pageUrl);
 
             // TODO: rewrite it to regexp
             foreach (var ignoreCondtition in ignoreList.Split(";"))
