@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace CssOptimizerU
@@ -51,10 +52,10 @@ namespace CssOptimizerU
 
             List<Usage> usages = _dbAnalyzeService.GetCssUsage(pageUrl, fileName);
 
+            var cssRules = usages.Select(usage => new { Content = usage.Selector.Content, CssRule = usage.Selector.FullRuleText}).Distinct();
 
-            // TODO: solve dublicate content when cut jsut one of the selector
-            foreach (var usage in usages) {
-                cssText += $"\n{usage.Selector.Content}";
+            foreach (var usage in cssRules) {
+                cssText += $"\n{usage.Content}";
             }
 
             return cssText;
