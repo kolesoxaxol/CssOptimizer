@@ -1,4 +1,5 @@
-﻿using CssOptimizerU.Models;
+﻿using CssOptimizerU.DM;
+using CssOptimizerU.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -76,6 +77,16 @@ namespace CssOptimizerU
                 var fileNames = context.Usages.Where(x => x.PageUrl.Equals(pageUrl)).Select(x=>x.FileName).Distinct().ToList();
 
                 return fileNames;
+            }
+        }
+
+        public List<Usage> GetCssUsage(string pageUrl, string fileName) {
+
+            using (var context = new CssAnalyzerContext(_options))
+            {
+                var usages = context.Usages.Include(s=>s.Selector).Where(x => x.PageUrl.Equals(pageUrl) && x.FileName.Equals(fileName)).ToList();
+
+                return usages;
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CssOptimizerU.DM;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -30,9 +31,9 @@ namespace CssOptimizerU
                 {
 
                     var optimizedCss = GetOptimizedCss(file, pageUrl);
-                    var fullpath = $"{destinationPath}/{file}";
+                    var fullpath = $"{destinationPath}/optimized_{file}";
 
-                    await File.WriteAllTextAsync(fullpath, optimizedCss);
+                    await System.IO.File.WriteAllTextAsync(fullpath, optimizedCss);
 
                     //  Logger.Info(message);
                     //  Archive(JobStatus.Success, jobSettings.ArchiveFolder, path, fileId, true);
@@ -46,8 +47,17 @@ namespace CssOptimizerU
         }
         public string GetOptimizedCss(string fileName, string pageUrl)
         {
+            var cssText = string.Empty;
 
-            return @".general-heading, h1, h2, h3, h4, h5 { font-family: 'assistantextrabold', sans-serif; color: inherit }";
+            List<Usage> usages = _dbAnalyzeService.GetCssUsage(pageUrl, fileName);
+
+
+            // TODO: solve dublicate content when cut jsut one of the selector
+            foreach (var usage in usages) {
+                cssText += $"\n{usage.Selector.Content}";
+            }
+
+            return cssText;
         }
     }
 }
