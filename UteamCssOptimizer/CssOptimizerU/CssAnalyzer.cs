@@ -148,14 +148,20 @@ namespace CssOptimizerU
         }
         private static CssUsingDataModel CollectUsageStatistic(IDocument document, CssUsingDataModel cssUsingDataModel)
         {
-            // TODO: add pseud classes :active :focus logic
+           
             foreach (var docStyle in cssUsingDataModel.DocStyles)
             {
                 DocStyle usageDocStyle = new DocStyle();
                 foreach (var selector in docStyle.Selectors)
                 {
+                    string selectorName = selector.Name;
 
-                    var usingCount = document.QuerySelectorAll(selector.Name).Length;
+                    //  check pseudo classes :active :focus logic
+                    if (selector.Content.Contains(":")) {
+                        selectorName = selector.Content.Split(";").FirstOrDefault();
+                    }
+
+                    var usingCount = document.QuerySelectorAll(selectorName).Length;
                     if (usingCount > 0)
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;

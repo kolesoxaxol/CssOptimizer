@@ -1,9 +1,7 @@
 ﻿using CssOptimizerU.DM;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace CssOptimizerU
 {
@@ -35,9 +33,7 @@ namespace CssOptimizerU
                     var fullpath = $"{destinationPath}/optimized_{file}";
 
                     await System.IO.File.WriteAllTextAsync(fullpath, optimizedCss);
-
-                    //  Logger.Info(message);
-                    //  Archive(JobStatus.Success, jobSettings.ArchiveFolder, path, fileId, true);
+         
                 }
 
             }
