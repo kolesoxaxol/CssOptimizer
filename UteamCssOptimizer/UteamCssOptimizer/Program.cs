@@ -1,4 +1,5 @@
 ﻿using CssOptimizerU;
+using CssOptimizerU.Models;
 using Microsoft.Extensions.Configuration;
 using System;
 
@@ -9,8 +10,10 @@ namespace UteamCssOptimizer
     {
         static void Main(string[] args)
         {
-            var address = "http://corona.uteam-dev.com/";
-            var cssUsingData =  CssAnalyzer.AnalyzePage(address);
+
+            CssAnalyzeOptions options = new CssAnalyzeOptions { cssProcessFileNames = Array.Empty<string>(), isProcessAllFiles = true, pageUrl = "https://rapnet-staging.azurewebsites.net/" };
+
+            var cssUsingData = CssAnalyzer.AnalyzePage(options);
 
 
             // TODO: check why config is null
@@ -20,18 +23,21 @@ namespace UteamCssOptimizer
               .AddEnvironmentVariables()
               .AddCommandLine(args)
               .Build();
-            
+
 
             var connectionString = configuration.GetConnectionString("DefaultConnection");
             ApplicationSettings settings = new ApplicationSettings();
             configuration.GetSection(ApplicationSettings.ApplicationSettingsSectionName).Bind(settings);
 
             CssAnalyzerDbService dbServcie = new CssAnalyzerDbService(connectionString);
-            dbServcie.SaveCssData(cssUsingData.Result);
 
-            
+            foreach (var cssData in cssUsingData.Result)
+            {
+                dbServcie.SaveCssData(cssData);
+            }
+
             CssOptimizer optimizer = new CssOptimizer(dbServcie);
-            optimizer.GenerateOptimizeCssFiles(settings.DestinationPath, address,settings.IgnoreFileCondition);
+            optimizer.GenerateOptimizeCssFiles(settings.DestinationPath, options.pageUrl, settings.IgnoreFileCondition);
             Console.ReadLine();
         }
     }

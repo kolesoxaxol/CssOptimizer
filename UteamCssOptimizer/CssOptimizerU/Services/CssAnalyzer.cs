@@ -5,53 +5,70 @@ using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Io;
 using CssOptimizerU.Models;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace CssOptimizerU
 {
     public class CssAnalyzer
     {
-        public static async Task<CssUsingDataModel> AnalyzePage(string pageUrl)
+        public static async Task<List<CssUsingDataModel>> AnalyzePage(CssAnalyzeOptions options)
         {
             var config = Configuration.Default.WithDefaultLoader(new LoaderOptions { IsResourceLoadingEnabled = true }).WithCss();
             var context = BrowsingContext.New(config);
-            var document = await context.OpenAsync(pageUrl);
-            var cssFileName = "general.css";
-            var sheets = GetAllCssFiles(document);
+            var document = await context.OpenAsync(options.pageUrl);
+            IEnumerable<IStyleSheet> sheets;
+            List<CssUsingDataModel> cssUsingDataModels = new List<CssUsingDataModel>();
 
-            Console.WriteLine("All css file on the page:\n");
+            if (options.isProcessAllFiles)
+            {
+                sheets = GetAllCssFiles(document);
+            }
+            else
+            {
+                // TODO optimize it with filter now we get all css files after filter it - need get just filterred list
+                sheets = GetAllCssFiles(document).Where(p => options.cssProcessFileNames.All(fileName => p.Href.Contains(fileName)));
+            }
+
+            Console.WriteLine("All process css files on the page:\n");
             foreach (var styleSheet in sheets)
             {
                 Console.WriteLine(styleSheet.Href);
             }
 
-            var sheet = sheets.FirstOrDefault(sh => sh.Href.Contains(cssFileName));
-            CssUsingDataModel cssUsingData = new CssUsingDataModel();
-            if (sheet != null)
+            if (!sheets.Any())
             {
+                Console.WriteLine("sheet is empty");
+                return cssUsingDataModels;
+            }
+
+            Regex reg = new Regex(@"(?:[^\/]*\/)*(.*?\.css)");
+
+            foreach (var sheet in sheets)
+            {
+                CssUsingDataModel cssUsingData = new CssUsingDataModel();
 
                 Console.WriteLine();
                 Console.WriteLine("+++++++++++++++++ Analyze general.css ++++++++++++++++++++++++++++++++++ :\n");
 
                 var docStyleData = await AnalyzeDocStyles(sheet);
-                docStyleData.FileName = cssFileName;
 
-               
-                cssUsingData.PageUrl = pageUrl;
+                Match match = reg.Match(sheet.Href);
+
+
+                docStyleData.FileName = match.Success ? match.Groups[1].Value : sheet.Href;
+
+                cssUsingData.PageUrl = options.pageUrl;
                 cssUsingData.DocStyles.Add(docStyleData);
                 cssUsingData = CollectUsageStatistic(document, cssUsingData);
 
-                return cssUsingData;
+                cssUsingDataModels.Add(cssUsingData);
             }
-            else {
-                Console.WriteLine("sheet is empty");
-                return cssUsingData;
-            }
+
+            return cssUsingDataModels;
         }
         private static IEnumerable<IStyleSheet> GetAllCssFiles(IDocument document)
         {
@@ -71,6 +88,7 @@ namespace CssOptimizerU
 
             return sheets;
         }
+
         private static async Task<DocStyle> AnalyzeDocStyles(IStyleSheet sheet)
         {
             DocStyle docStyleData = new DocStyle();
@@ -112,6 +130,11 @@ namespace CssOptimizerU
                     {
                         ICssGroupingRule mediaRule = rule as ICssGroupingRule;
                     }
+                    if (rule is ICssKeyframesRule)
+                    {
+
+                        ICssKeyframesRule keyFrameRule = rule as ICssKeyframesRule;
+                    }
                     else
                     {
                         ICssGroupingRule groupRule = rule as ICssGroupingRule;
@@ -148,20 +171,37 @@ namespace CssOptimizerU
         }
         private static CssUsingDataModel CollectUsageStatistic(IDocument document, CssUsingDataModel cssUsingDataModel)
         {
-           
+
             foreach (var docStyle in cssUsingDataModel.DocStyles)
             {
                 DocStyle usageDocStyle = new DocStyle();
                 foreach (var selector in docStyle.Selectors)
                 {
                     string selectorName = selector.Name;
+                    int usingCount = 0;
 
                     //  check pseudo classes :active :focus logic
-                    if (selector.Content.Contains(":")) {
-                        selectorName = selector.Content.Split(";").FirstOrDefault();
+                    if (selectorName.Contains(":"))
+                    {
+                        // possible tag a[href^=\"javascript:\"]:after
+                        var pseudoSelector = selector.Name.Split(":").LastOrDefault();
+                        selectorName = selector.Name.Replace($":{pseudoSelector}", string.Empty);
+
                     }
 
-                    var usingCount = document.QuerySelectorAll(selectorName).Length;
+                    // TODO there are extra cases svg:not(:root) audio:not([controls]) a[href^=\"javascript:\"]:after we count it used now
+                    try
+                    {
+
+                        usingCount = document.QuerySelectorAll(selectorName).Length;
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Wrong tag after parsing: {selector.Name} {selectorName}");
+                        usingCount = 1;
+                    }
+
                     if (usingCount > 0)
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
@@ -175,6 +215,7 @@ namespace CssOptimizerU
                     }
 
                     Console.WriteLine($"count elements by query for selector: {selector.Name} -  {usingCount}");
+
                 }
 
                 if (usageDocStyle.Selectors.Any())
