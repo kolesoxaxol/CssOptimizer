@@ -126,15 +126,16 @@ namespace CssOptimizerU
 
                 if (rule is ICssGroupingRule)
                 {
-                    if (rule is ICssMediaRule)
+                    if (rule is ICssMediaRule || rule is ICssSupportsRule)
                     {
                         ICssGroupingRule mediaRule = rule as ICssGroupingRule;
                     }
+                    else 
                     if (rule is ICssKeyframesRule)
                     {
 
                         ICssKeyframesRule keyFrameRule = rule as ICssKeyframesRule;
-                    }
+                    }           
                     else
                     {
                         ICssGroupingRule groupRule = rule as ICssGroupingRule;
