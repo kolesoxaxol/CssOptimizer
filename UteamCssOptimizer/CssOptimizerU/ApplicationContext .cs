@@ -16,7 +16,7 @@ namespace CssOptimizerU
 
         public CssAnalyzerContext(DbContextOptions<CssAnalyzerContext> options) : base(options)
         {
-           // Database.EnsureDeleted();
+            //Database.EnsureDeleted();
             Database.EnsureCreated();
         }
 

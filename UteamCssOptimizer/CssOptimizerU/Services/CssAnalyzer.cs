@@ -171,8 +171,6 @@ namespace CssOptimizerU
                 }
             }
 
-
-
             return docStyleData;
         }
         private static CssUsingDataModel CollectUsageStatistic(IDocument document, CssUsingDataModel cssUsingDataModel)
@@ -202,7 +200,7 @@ namespace CssOptimizerU
                         usingCount = document.QuerySelectorAll(selectorName).Length;
 
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         Console.WriteLine($"Wrong tag after parsing: {selector.Name} {selectorName}");
                         usingCount = 1;

@@ -51,13 +51,13 @@ namespace CssOptimizerU
 
             List<Usage> usages = _dbAnalyzeService.GetCssUsage(pageUrl, fileName);
 
-            var cssRules = usages.Select(usage => new OptimizedCssRule { Content = usage.Selector.Content, CssRule = usage.Selector.FullRuleText, ConditionText = usage.Selector.ConditionText}).Distinct();
+            var cssRules = usages.Select(usage => new OptimizedCssRule { Content = usage.Selector.Content, CssRule = usage.Selector.FullRuleText, ConditionText = usage.Selector.ConditionText, Id = usage.Selector.Id}).Distinct().OrderBy(x=>x.Id);
 
             foreach (var usage in cssRules) {
 
                 if (string.IsNullOrWhiteSpace(usage.ConditionText))
                 {
-                    cssText += $"\n{usage.Content}";
+                    cssText += $"\n {usage.Id}\t{usage.Content} ";
                 }
                 else 
                 {
