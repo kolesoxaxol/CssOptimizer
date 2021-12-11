@@ -57,7 +57,7 @@ namespace CssOptimizerU
 
                 if (string.IsNullOrWhiteSpace(usage.ConditionText))
                 {
-                    cssText += $"\n {usage.Id}\t{usage.Content} ";
+                    cssText += $"\n{usage.Content} ";
                 }
                 else 
                 {
