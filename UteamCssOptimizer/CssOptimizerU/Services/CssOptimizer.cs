@@ -9,8 +9,6 @@ namespace CssOptimizerU
     public class CssOptimizer
     {
         private readonly CssAnalyzerDbService _dbAnalyzeService;
-
-        private List<MediaCss> _mediaCssList = new List<MediaCss>();
         public CssOptimizer(CssAnalyzerDbService dbAnalyzeService) {
 
             _dbAnalyzeService = dbAnalyzeService;
@@ -24,7 +22,7 @@ namespace CssOptimizerU
             // TODO: rewrite it to regexp
             foreach (var ignoreCondtition in ignoreList.Split(";"))
             {
-                fileList = fileList.FindAll(x=>!x.Contains(ignoreCondtition));
+                fileList = fileList.FindAll(x=>!x.Name.Contains(ignoreCondtition));
             }
 
             try
@@ -32,8 +30,8 @@ namespace CssOptimizerU
                 foreach (var file in fileList)
                 {
 
-                    var optimizedCss = GetOptimizedCss(file, pageUrl);
-                    var fullpath = $"{destinationPath}/optimized_{file}";
+                    var optimizedCss = GetOptimizedCss(file.Id, pageUrl);
+                    var fullpath = $"{destinationPath}/optimized_{file.Name}";
 
                     // optimize it
                     await System.IO.File.WriteAllTextAsync(fullpath, optimizedCss);
@@ -46,13 +44,14 @@ namespace CssOptimizerU
                 Console.WriteLine("Creating file error:" + ex.Message);
             }
         }
-        public string GetOptimizedCss(string fileName, string pageUrl)
+        public string GetOptimizedCss(int fileId, string pageUrl)
         {
             var cssText = string.Empty;
 
-            List<Usage> usages = _dbAnalyzeService.GetCssUsage(pageUrl, fileName);
+            List<Usage> usages = _dbAnalyzeService.GetCssUsage(pageUrl, fileId);
 
-            var cssRules = usages.Select(usage => new OptimizedCssRule { Content = usage.Selector.Content, CssRule = usage.Selector.FullRuleText, ConditionText = usage.Selector.ConditionText, Id = usage.Selector.Id });
+            var cssRules = usages.Select(usage => new OptimizedCssRule { Content = usage.Selector.Content, CssRule = usage.Selector.FullRuleText, ConditionText = usage.Selector.ConditionText });
+            List<MediaCss> _mediaCssList = new List<MediaCss>();
 
             foreach (var usage in cssRules) {
 
@@ -62,7 +61,7 @@ namespace CssOptimizerU
                 }
                 else 
                 {
-                    _mediaCssList = ProcessConditions(usage);
+                    _mediaCssList = ProcessConditions(usage, _mediaCssList);
                 }
           
             }
@@ -76,7 +75,7 @@ namespace CssOptimizerU
             return cssText;
         }
 
-        private List<MediaCss> ProcessConditions(OptimizedCssRule optimizedCssRule) 
+        private List<MediaCss> ProcessConditions(OptimizedCssRule optimizedCssRule, List<MediaCss> _mediaCssList) 
         {
             var condition = _mediaCssList.FirstOrDefault(condition => condition.MediaSelectorName.Equals(optimizedCssRule.ConditionText));
 

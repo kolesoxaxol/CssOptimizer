@@ -38,6 +38,7 @@ namespace UteamCssOptimizer
 
             CssOptimizer optimizer = new CssOptimizer(dbServcie);
             optimizer.GenerateOptimizeCssFiles(settings.DestinationPath, options.pageUrl, settings.IgnoreFileCondition);
+            Console.WriteLine("I am done!!!");
             Console.ReadLine();
         }
     }

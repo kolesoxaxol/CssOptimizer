@@ -16,7 +16,7 @@ namespace CssOptimizerU
 
         public CssAnalyzerContext(DbContextOptions<CssAnalyzerContext> options) : base(options)
         {
-            //Database.EnsureDeleted();
+            
             Database.EnsureCreated();
         }
 
@@ -25,6 +25,10 @@ namespace CssOptimizerU
         {
             modelBuilder.Entity<File>()
             .HasMany(b => b.Selectors)
+            .WithOne(i => i.File);
+
+            modelBuilder.Entity<File>()
+            .HasMany(b => b.Usages)
             .WithOne(i => i.File);
 
             modelBuilder.Entity<Selector>()

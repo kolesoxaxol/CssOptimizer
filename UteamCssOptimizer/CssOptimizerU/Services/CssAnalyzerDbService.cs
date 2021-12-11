@@ -60,7 +60,7 @@ namespace CssOptimizerU
                                 UpdateDate = DateTime.Now,
                                 PageUrl = cssUsingData.PageUrl,
                                 Selector = cssSelector,
-                                FileName = docStyle.FileName
+                                File = file
                             };
 
                             context.Usages.Add(usage);
@@ -73,20 +73,20 @@ namespace CssOptimizerU
             }
 
         }
-        public List<string> GetCssFileNames(string pageUrl) {
+        public List<File> GetCssFileNames(string pageUrl) {
             using (var context = new CssAnalyzerContext(_options))
             {
-                var fileNames = context.Usages.Where(x => x.PageUrl.Equals(pageUrl)).Select(x=>x.FileName).Distinct().ToList();
+                var fileNames = context.Files.ToList();
 
                 return fileNames;
             }
         }
 
-        public List<Usage> GetCssUsage(string pageUrl, string fileName) {
+        public List<Usage> GetCssUsage(string pageUrl, int fileId) {
 
             using (var context = new CssAnalyzerContext(_options))
             {
-                var usages = context.Usages.Include(s=>s.Selector).Where(x => x.PageUrl.Equals(pageUrl) && x.FileName.Equals(fileName)).ToList();
+                var usages = context.Usages.Include(s=>s.Selector).Where(x => x.PageUrl.Equals(pageUrl) && x.File.Id == fileId).ToList();
 
                 return usages;
             }
