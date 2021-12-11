@@ -33,6 +33,7 @@ namespace CssOptimizerU
                 {
                     var file = new DM.File { CreatedDate = DateTime.Now, Name = docStyle.FileName, UpdateDate = DateTime.Now };
                     context.Files.Add(file);
+                    context.SaveChanges();
 
                     foreach (var selector in docStyle.Selectors)
                     {
@@ -48,6 +49,7 @@ namespace CssOptimizerU
                         };
 
                         context.Selector.Add(cssSelector);
+                        context.SaveChanges();
 
                         if (selector.IsUsed)
                         {
@@ -62,12 +64,12 @@ namespace CssOptimizerU
                             };
 
                             context.Usages.Add(usage);
+                            context.SaveChanges();
                         }
                     }
 
                 }
 
-                context.SaveChanges();
             }
 
         }

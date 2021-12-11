@@ -35,6 +35,7 @@ namespace CssOptimizerU
                     var optimizedCss = GetOptimizedCss(file, pageUrl);
                     var fullpath = $"{destinationPath}/optimized_{file}";
 
+                    // optimize it
                     await System.IO.File.WriteAllTextAsync(fullpath, optimizedCss);
          
                 }
@@ -51,7 +52,7 @@ namespace CssOptimizerU
 
             List<Usage> usages = _dbAnalyzeService.GetCssUsage(pageUrl, fileName);
 
-            var cssRules = usages.Select(usage => new OptimizedCssRule { Content = usage.Selector.Content, CssRule = usage.Selector.FullRuleText, ConditionText = usage.Selector.ConditionText, Id = usage.Selector.Id}).Distinct().OrderBy(x=>x.Id);
+            var cssRules = usages.Select(usage => new OptimizedCssRule { Content = usage.Selector.Content, CssRule = usage.Selector.FullRuleText, ConditionText = usage.Selector.ConditionText, Id = usage.Selector.Id });
 
             foreach (var usage in cssRules) {
 
@@ -68,7 +69,7 @@ namespace CssOptimizerU
 
             foreach (var cssMedia in _mediaCssList)
             {
-                cssText += "\n"+ cssMedia.MediaSelectorName + "\n{\n";
+                cssText += "\n@media "+ cssMedia.MediaSelectorName + "\n{\n";
                 cssText += cssMedia.Value + "}\n";
             }
 
