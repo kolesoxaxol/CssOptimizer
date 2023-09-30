@@ -64,7 +64,7 @@ namespace CssOptimizerU
                 docStyleData.FileName = match.Success ? match.Groups[1].Value : sheet.Href;
 
                 cssUsingData.PageUrl = options.pageUrl;
-                cssUsingData.DocStyles.ToList().Add(docStyleData);
+                cssUsingData.DocStyles.Add(docStyleData);
                 cssUsingData = CollectUsageStatistic(document, cssUsingData);
 
                 cssUsingDataModels.Add(cssUsingData);
@@ -166,7 +166,7 @@ namespace CssOptimizerU
                         {
                             foreach (var selector in selectorText.Split(','))
                             {
-                                docStyleData.Selectors.ToList().Add(new DocStyleSelector { FullRuleText = selectorText, Content = rule.CssText, Name = selector, ConditionText = conditionText });
+                                docStyleData.Selectors.Add(new DocStyleSelector { FullRuleText = selectorText, Content = rule.CssText, Name = selector, ConditionText = conditionText });
                             }
                         }
                     }

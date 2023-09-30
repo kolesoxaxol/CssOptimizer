@@ -10,6 +10,6 @@ namespace CssOptimizerU.Models
         }
         public string FileName { get; set; }
 
-        public IEnumerable<DocStyleSelector> Selectors { get; set; }
+        public List<DocStyleSelector> Selectors { get; set; }
     }
 }
