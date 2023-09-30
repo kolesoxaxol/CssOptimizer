@@ -8,15 +8,15 @@ namespace CssOptimizerU
 {
     public class CssOptimizer
     {
-        private readonly CssAnalyzerDbService _dbAnalyzeService;
-        public CssOptimizer(CssAnalyzerDbService dbAnalyzeService) {
+        private readonly ICssAnalyzerDbService _dbAnalyzeService;
+        public CssOptimizer(ICssAnalyzerDbService dbAnalyzeService) {
 
             _dbAnalyzeService = dbAnalyzeService;
         }
 
         public async void GenerateOptimizeCssFiles(string destinationPath, string pageUrl, string ignoreList)
         {
-            var fileList = _dbAnalyzeService.GetCssFileNames();
+            var fileList = _dbAnalyzeService.GetCssFileNames().ToList();
 
             // TODO: rewrite it to regexp
             foreach (var ignoreCondtition in ignoreList.Split(";"))
@@ -47,7 +47,7 @@ namespace CssOptimizerU
         {
             var cssText = string.Empty;
 
-            List<Usage> usages = _dbAnalyzeService.GetCssUsage(pageUrl, fileId);
+            List<Usage> usages = _dbAnalyzeService.GetCssUsage(pageUrl, fileId).ToList();
 
             var cssRules = usages.Select(usage => new OptimizedCssRule { Content = usage.Selector.Content, CssRule = usage.Selector.FullRuleText, ConditionText = usage.Selector.ConditionText });
             List<MediaCss> _mediaCssList = new List<MediaCss>();

@@ -19,19 +19,19 @@ namespace CssOptimizerU
         {
 			IConfiguration config = Configuration.Default.WithDefaultLoader(new LoaderOptions { IsResourceLoadingEnabled = true}).WithCss();
 			IBrowsingContext context = BrowsingContext.New(config);
-			IDocument document = await context.OpenAsync(options.pageUrl);
+			IDocument document = await context.OpenAsync(options.PageUrl);
 
             IEnumerable<IStyleSheet> sheets;
             List<CssUsingDataModel> cssUsingDataModels = new List<CssUsingDataModel>();
 
-            if (options.isProcessAllFiles)
+            if (options.IsProcessAllFiles)
             {
                 sheets = GetAllCssFiles(document);
             }
             else
             {
                 // TODO optimize it with filter now we get all css files after filter it - need get just filterred list
-                sheets = GetAllCssFiles(document).Where(p => options.cssProcessFileNames.All(fileName => p.Href.Contains(fileName)));
+                sheets = GetAllCssFiles(document).Where(p => options.CssProcessFileNames.All(fileName => p.Href.Contains(fileName)));
             }
 
             Console.WriteLine("All process css files on the page:\n");
@@ -63,7 +63,7 @@ namespace CssOptimizerU
 
                 docStyleData.FileName = match.Success ? match.Groups[1].Value : sheet.Href;
 
-                cssUsingData.PageUrl = options.pageUrl;
+                cssUsingData.PageUrl = options.PageUrl;
                 cssUsingData.DocStyles.Add(docStyleData);
                 cssUsingData = CollectUsageStatistic(document, cssUsingData);
 

@@ -2,8 +2,8 @@
 {
     public class CssAnalyzeOptions
     {
-        public string pageUrl { get; set; }
-        public string[] cssProcessFileNames { get; set; }
-        public bool isProcessAllFiles { get; set; }
+        public string PageUrl { get; set; }
+        public string[] CssProcessFileNames { get; set; }
+        public bool IsProcessAllFiles { get; set; }
     }
 }

@@ -7,86 +7,93 @@ using System.Linq;
 
 namespace CssOptimizerU
 {
-	public class CssAnalyzerDbService
-    {
-        private readonly string _connectionString;
-        private readonly DbContextOptions<CssAnalyzerContext> _options;
+	public interface ICssAnalyzerDbService
+	{
+		IEnumerable<File> GetCssFileNames();
+		IEnumerable<Usage> GetCssUsage(string pageUrl, int fileId);
+		void SaveCssData(CssUsingDataModel cssUsingData);
+	}
 
-        public CssAnalyzerDbService(string connectionString = "Server=localhost\\SQLEXPRESS; Database=UteamCssAnalyzer; Trusted_Connection=True; MultipleActiveResultSets=true")
-        {
-            _connectionString = connectionString;
+	public class CssAnalyzerDbService : ICssAnalyzerDbService
+	{
+		private readonly string _connectionString;
+		private readonly DbContextOptions<CssAnalyzerContext> _options;
 
-            var optionsBuilder = new DbContextOptionsBuilder<CssAnalyzerContext>();
+		public CssAnalyzerDbService(string connectionString)
+		{
+			_connectionString = connectionString;
 
-            _options = optionsBuilder
-                    .UseSqlServer(_connectionString)
-                    .Options;
-        }
+			var optionsBuilder = new DbContextOptionsBuilder<CssAnalyzerContext>();
 
-        public void SaveCssData(CssUsingDataModel cssUsingData)
-        {
-            using (var context = new CssAnalyzerContext(_options))
-            {
-                foreach (var docStyle in cssUsingData.DocStyles)
-                {
-                    var file = new DM.File { CreatedDate = DateTime.Now, Name = docStyle.FileName, UpdateDate = DateTime.Now };
-                    context.Files.Add(file);
-                    context.SaveChanges();
+			_options = optionsBuilder
+					.UseSqlServer(_connectionString)
+					.Options;
+		}
 
-                    foreach (var selector in docStyle.Selectors)
-                    {
-                        var cssSelector = new DM.Selector
-                        {
-                            CreatedDate = DateTime.Now,
-                            UpdateDate = DateTime.Now,
-                            Content = selector.Content,
-                            FullRuleText = selector.FullRuleText,
-                            ConditionText = selector.ConditionText,
-                            Name = selector.Name,
-                            File = file
-                        };
+		public void SaveCssData(CssUsingDataModel cssUsingData)
+		{
+			using (var context = new CssAnalyzerContext(_options))
+			{
+				foreach (var docStyle in cssUsingData.DocStyles)
+				{
+					var file = new DM.File { CreatedDate = DateTime.Now, Name = docStyle.FileName, UpdateDate = DateTime.Now };
+					context.Files.Add(file);
+					context.SaveChanges();
 
-                        context.Selector.Add(cssSelector);
-                        context.SaveChanges();
+					foreach (var selector in docStyle.Selectors)
+					{
+						var cssSelector = new DM.Selector
+						{
+							CreatedDate = DateTime.Now,
+							UpdateDate = DateTime.Now,
+							Content = selector.Content,
+							FullRuleText = selector.FullRuleText,
+							ConditionText = selector.ConditionText,
+							Name = selector.Name,
+							File = file
+						};
 
-                        if (selector.IsUsed)
-                        {
+						context.Selector.Add(cssSelector);
+						context.SaveChanges();
 
-                            DM.Usage usage = new DM.Usage
-                            {
-                                CreatedDate = DateTime.Now,
-                                UpdateDate = DateTime.Now,
-                                PageUrl = cssUsingData.PageUrl,
-                                Selector = cssSelector,
-                                File = file
-                            };
+						if (selector.IsUsed)
+						{
 
-                            context.Usages.Add(usage);
-                            context.SaveChanges();
-                        }
-                    }
+							DM.Usage usage = new DM.Usage
+							{
+								CreatedDate = DateTime.Now,
+								UpdateDate = DateTime.Now,
+								PageUrl = cssUsingData.PageUrl,
+								Selector = cssSelector,
+								File = file
+							};
 
-                }
+							context.Usages.Add(usage);
+							context.SaveChanges();
+						}
+					}
 
-            }
-        }
+				}
 
-        public List<File> GetCssFileNames()
-        {
+			}
+		}
+
+		public IEnumerable<File> GetCssFileNames()
+		{
 			using var context = new CssAnalyzerContext(_options);
 			var fileNames = context.Files.ToList();
 
 			return fileNames;
 		}
 
-        public List<Usage> GetCssUsage(string pageUrl, int fileId) {
+		public IEnumerable<Usage> GetCssUsage(string pageUrl, int fileId)
+		{
+			using (var context = new CssAnalyzerContext(_options))
+			{
+				var usages = context.Usages.Include(s => s.Selector).Where(x => x.PageUrl.Equals(pageUrl) && x.File.Id == fileId).ToList();
 
-            using (var context = new CssAnalyzerContext(_options))
-            {
-                var usages = context.Usages.Include(s=>s.Selector).Where(x => x.PageUrl.Equals(pageUrl) && x.File.Id == fileId).ToList();
-
-                return usages;
-            }
-        }
-    }
+				return usages;
+			}
+		}
+	}
 }
