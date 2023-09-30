@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CssOptimizerU.Models
+﻿namespace CssOptimizerU.Models
 {
-    public class DocStyleSelector
+	public class DocStyleSelector
     {
         public string Name { get; set; }
         public string Content { get; set; }

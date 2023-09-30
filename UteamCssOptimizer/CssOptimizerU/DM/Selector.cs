@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CssOptimizerU.DM
+﻿namespace CssOptimizerU.DM
 {
-    public class Selector : BaseEntity
+	public class Selector : BaseEntity
     {
         public int Id { get; set; }
         public string Name { get; set; }

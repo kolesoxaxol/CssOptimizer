@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CssOptimizerU.DM
+﻿namespace CssOptimizerU.DM
 {
-    public class Usage : BaseEntity
+	public class Usage : BaseEntity
     {
         public int Id { get; set; }
         public string PageUrl { get; set; }

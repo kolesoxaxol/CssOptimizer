@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace CssOptimizerU.Models
 {
-    public class DocStyle
+	public class DocStyle
     {
         public DocStyle()
         {
@@ -12,6 +10,6 @@ namespace CssOptimizerU.Models
         }
         public string FileName { get; set; }
 
-        public List<DocStyleSelector> Selectors { get; set; }
+        public IEnumerable<DocStyleSelector> Selectors { get; set; }
     }
 }

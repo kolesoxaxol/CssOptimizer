@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace CssOptimizerU.Models
 {
-    public class CssUsingDataModel
+	public class CssUsingDataModel
     {
         public CssUsingDataModel()
         {
@@ -12,7 +11,7 @@ namespace CssOptimizerU.Models
         }
 
         public string PageUrl { get; set; }
-        public List<DocStyle> DocStyles { get; set; }
-        public List<DocStyle> UsageStyles { get; set; }
+        public IEnumerable<DocStyle> DocStyles { get; set; }
+        public IEnumerable<DocStyle> UsageStyles { get; set; }
     }
 }

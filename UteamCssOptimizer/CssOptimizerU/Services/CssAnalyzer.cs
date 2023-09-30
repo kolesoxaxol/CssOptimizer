@@ -62,7 +62,7 @@ namespace CssOptimizerU
                 docStyleData.FileName = match.Success ? match.Groups[1].Value : sheet.Href;
 
                 cssUsingData.PageUrl = options.pageUrl;
-                cssUsingData.DocStyles.Add(docStyleData);
+                cssUsingData.DocStyles.ToList().Add(docStyleData);
                 cssUsingData = CollectUsageStatistic(document, cssUsingData);
 
                 cssUsingDataModels.Add(cssUsingData);
@@ -156,15 +156,15 @@ namespace CssOptimizerU
                     Console.WriteLine(rule.CssText);
 
 
-                    if (rule is ICssStyleRule)
+					if (rule is ICssStyleRule cssStyleRule)
                     {
-                        var selectorText = ((ICssStyleRule)rule).SelectorText;
+                        var selectorText = cssStyleRule.SelectorText;
+
                         if (!string.IsNullOrEmpty(selectorText))
                         {
                             foreach (var selector in selectorText.Split(','))
                             {
-                                docStyleData.Selectors.Add(new DocStyleSelector { FullRuleText = selectorText, Content = rule.CssText, Name = selector, ConditionText = conditionText });
-
+                                docStyleData.Selectors.ToList().Add(new DocStyleSelector { FullRuleText = selectorText, Content = rule.CssText, Name = selector, ConditionText = conditionText });
                             }
                         }
                     }
@@ -182,7 +182,7 @@ namespace CssOptimizerU
                 foreach (var selector in docStyle.Selectors)
                 {
                     string selectorName = selector.Name;
-                    int usingCount = 0;
+                    int usingCount;
 
                     //  check pseudo classes :active :focus logic
                     if (selectorName.Contains(":"))
@@ -209,7 +209,7 @@ namespace CssOptimizerU
                     if (usingCount > 0)
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        usageDocStyle.Selectors.Add(selector);
+                        usageDocStyle.Selectors.ToList().Add(selector);
                         selector.IsUsed = true;
 
                     }
@@ -225,7 +225,7 @@ namespace CssOptimizerU
                 if (usageDocStyle.Selectors.Any())
                 {
                     usageDocStyle.FileName = docStyle.FileName;
-                    cssUsingDataModel.UsageStyles.Add(usageDocStyle);
+                    cssUsingDataModel.UsageStyles.ToList().Add(usageDocStyle);
                 }
 
             }

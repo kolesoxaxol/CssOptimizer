@@ -4,14 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace CssOptimizerU
 {
-    public class CssAnalyzerDbService
+	public class CssAnalyzerDbService
     {
-        private string _connectionString;
-        private DbContextOptions<CssAnalyzerContext> _options;
+        private readonly string _connectionString;
+        private readonly DbContextOptions<CssAnalyzerContext> _options;
 
         public CssAnalyzerDbService(string connectionString = "Server=localhost\\SQLEXPRESS; Database=UteamCssAnalyzer; Trusted_Connection=True; MultipleActiveResultSets=true")
         {
@@ -73,14 +72,13 @@ namespace CssOptimizerU
             }
 
         }
-        public List<File> GetCssFileNames(string pageUrl) {
-            using (var context = new CssAnalyzerContext(_options))
-            {
-                var fileNames = context.Files.ToList();
+        public List<File> GetCssFileNames()
+        {
+			using var context = new CssAnalyzerContext(_options);
+			var fileNames = context.Files.ToList();
 
-                return fileNames;
-            }
-        }
+			return fileNames;
+		}
 
         public List<Usage> GetCssUsage(string pageUrl, int fileId) {
 
