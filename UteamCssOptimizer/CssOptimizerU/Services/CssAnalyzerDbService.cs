@@ -25,7 +25,6 @@ namespace CssOptimizerU
 
         public void SaveCssData(CssUsingDataModel cssUsingData)
         {
-
             using (var context = new CssAnalyzerContext(_options))
             {
                 foreach (var docStyle in cssUsingData.DocStyles)
@@ -70,8 +69,8 @@ namespace CssOptimizerU
                 }
 
             }
-
         }
+
         public List<File> GetCssFileNames()
         {
 			using var context = new CssAnalyzerContext(_options);

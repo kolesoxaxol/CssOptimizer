@@ -16,7 +16,6 @@ namespace CssOptimizerU
 
         public async void GenerateOptimizeCssFiles(string destinationPath, string pageUrl, string ignoreList)
         {
-
             var fileList = _dbAnalyzeService.GetCssFileNames();
 
             // TODO: rewrite it to regexp

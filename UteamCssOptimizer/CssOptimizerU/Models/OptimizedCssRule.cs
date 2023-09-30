@@ -4,7 +4,6 @@
     {
         public string Content { get; set; }
         public string CssRule { get; set; }
-        public string ConditionText { get; set; }    
-       
+        public string ConditionText { get; set; }          
     }
 }

@@ -17,9 +17,10 @@ namespace CssOptimizerU
     {
         public static async Task<List<CssUsingDataModel>> AnalyzePage(CssAnalyzeOptions options)
         {
-            var config = Configuration.Default.WithDefaultLoader(new LoaderOptions { IsResourceLoadingEnabled = true }).WithCss();
-            var context = BrowsingContext.New(config);
-            var document = await context.OpenAsync(options.pageUrl);
+			IConfiguration config = Configuration.Default.WithDefaultLoader(new LoaderOptions { IsResourceLoadingEnabled = true}).WithCss();
+			IBrowsingContext context = BrowsingContext.New(config);
+			IDocument document = await context.OpenAsync(options.pageUrl);
+
             IEnumerable<IStyleSheet> sheets;
             List<CssUsingDataModel> cssUsingDataModels = new List<CssUsingDataModel>();
 
@@ -34,6 +35,7 @@ namespace CssOptimizerU
             }
 
             Console.WriteLine("All process css files on the page:\n");
+
             foreach (var styleSheet in sheets)
             {
                 Console.WriteLine(styleSheet.Href);

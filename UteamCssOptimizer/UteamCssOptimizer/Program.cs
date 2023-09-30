@@ -3,18 +3,15 @@ using CssOptimizerU.Models;
 using Microsoft.Extensions.Configuration;
 using System;
 
-
 namespace UteamCssOptimizer
 {
     class Program
     {
         static void Main(string[] args)
         {
-
             CssAnalyzeOptions options = new CssAnalyzeOptions { cssProcessFileNames = Array.Empty<string>(), isProcessAllFiles = true, pageUrl = "https://rapnet-staging.azurewebsites.net/" };
 
             var cssUsingData = CssAnalyzer.AnalyzePage(options);
-
 
             // TODO: check why config is null
             IConfiguration configuration = new ConfigurationBuilder()
@@ -23,7 +20,6 @@ namespace UteamCssOptimizer
               .AddEnvironmentVariables()
               .AddCommandLine(args)
               .Build();
-
 
             var connectionString = configuration.GetConnectionString("DefaultConnection");
             ApplicationSettings settings = new ApplicationSettings();

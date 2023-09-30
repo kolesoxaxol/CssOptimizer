@@ -1,6 +1,5 @@
 ﻿namespace CssOptimizerU.Models
 {
-
     public class CssAnalyzeOptions
     {
         public string pageUrl { get; set; }
