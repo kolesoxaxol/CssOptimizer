@@ -1,6 +1,8 @@
 ﻿using CssOptimizerU;
 using CssOptimizerU.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 
 namespace UteamCssOptimizer
@@ -11,9 +13,18 @@ namespace UteamCssOptimizer
 		{
 			CssAnalyzeOptions options = new CssAnalyzeOptions { CssProcessFileNames = Array.Empty<string>(), IsProcessAllFiles = true, PageUrl = "http://bara.uteam-dev.com/" };
 
+			var serilogLogger = new LoggerConfiguration()
+			.Enrich.FromLogContext()
+			.WriteTo.Console().MinimumLevel.Debug()
+			.CreateLogger();
 
+			var loggerFactory = (ILoggerFactory)new LoggerFactory();
+			loggerFactory.AddSerilog(serilogLogger);
+			var cssAnalyzerLogger = loggerFactory.CreateLogger<CssAnalyzer>();
+			var cssOptimizerLogger = loggerFactory.CreateLogger<CssOptimizer>();
+	
 			// step 1: analyze Data
-			var cssUsingData = CssAnalyzer.AnalyzePage(options);
+			var cssUsingData = new CssAnalyzer(cssAnalyzerLogger).AnalyzePage(options);
 
 			IConfiguration configuration = new ConfigurationBuilder()
 			  .SetBasePath(Environment.CurrentDirectory)
@@ -26,7 +37,6 @@ namespace UteamCssOptimizer
 			ApplicationSettings settings = new ApplicationSettings();
 			configuration.GetSection(ApplicationSettings.ApplicationSettingsSectionName).Bind(settings);
 
-
 			// step 2: Save data to Db
 			ICssAnalyzerDbService dbServcie = new CssAnalyzerDbService(connectionString);
 
@@ -36,10 +46,10 @@ namespace UteamCssOptimizer
 			}
 
 			// step 3: Generate optimixed css
-			CssOptimizer optimizer = new CssOptimizer(dbServcie);
+			CssOptimizer optimizer = new CssOptimizer(dbServcie, cssOptimizerLogger);
 			optimizer.GenerateOptimizeCssFiles(settings.DestinationPath, options.PageUrl, settings.IgnoreFileCondition);
-			Console.WriteLine("I am done!!!");
-			Console.ReadLine();
+
+			Log.Debug("I am done!!!\n");		
 		}
 	}
 }

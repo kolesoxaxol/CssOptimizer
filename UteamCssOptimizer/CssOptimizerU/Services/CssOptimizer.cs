@@ -1,5 +1,6 @@
 ﻿using CssOptimizerU.DM;
 using CssOptimizerU.Models;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,12 @@ namespace CssOptimizerU
     public class CssOptimizer
     {
         private readonly ICssAnalyzerDbService _dbAnalyzeService;
-        public CssOptimizer(ICssAnalyzerDbService dbAnalyzeService) {
+        private readonly ILogger<CssOptimizer> _logger;
+        public CssOptimizer(ICssAnalyzerDbService dbAnalyzeService, ILogger<CssOptimizer> logger) {
 
             _dbAnalyzeService = dbAnalyzeService;
-        }
+            _logger = logger;
+		}
 
         public async void GenerateOptimizeCssFiles(string destinationPath, string pageUrl, string ignoreList)
         {
@@ -33,14 +36,13 @@ namespace CssOptimizerU
                     var fullpath = $"{destinationPath}/optimized_{file.Name}";
 
                     // optimize it
-                    await System.IO.File.WriteAllTextAsync(fullpath, optimizedCss);
-         
+                    await System.IO.File.WriteAllTextAsync(fullpath, optimizedCss);        
                 }
 
             }
             catch (Exception ex)
-            {   //TODO: add logs
-                Console.WriteLine("Creating file error:" + ex.Message);
+            { 
+                _logger.LogError("Creating file error:" + ex.Message);
             }
         }
         public string GetOptimizedCss(int fileId, string pageUrl)
@@ -61,8 +63,7 @@ namespace CssOptimizerU
                 else 
                 {
                     _mediaCssList = ProcessConditions(usage, _mediaCssList);
-                }
-          
+                }      
             }
 
             foreach (var cssMedia in _mediaCssList)

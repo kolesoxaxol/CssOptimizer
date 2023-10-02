@@ -42,7 +42,7 @@ namespace CssOptimizerU
 
 					foreach (var selector in docStyle.Selectors)
 					{
-						var cssSelector = new DM.Selector
+						var cssSelector = new Selector
 						{
 							CreatedDate = DateTime.Now,
 							UpdateDate = DateTime.Now,
@@ -59,7 +59,7 @@ namespace CssOptimizerU
 						if (selector.IsUsed)
 						{
 
-							DM.Usage usage = new DM.Usage
+							Usage usage = new Usage
 							{
 								CreatedDate = DateTime.Now,
 								UpdateDate = DateTime.Now,
@@ -74,7 +74,6 @@ namespace CssOptimizerU
 					}
 
 				}
-
 			}
 		}
 

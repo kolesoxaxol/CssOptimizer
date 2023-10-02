@@ -5,6 +5,7 @@ using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Io;
 using CssOptimizerU.Models;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +16,17 @@ namespace CssOptimizerU
 {
     public class CssAnalyzer
     {
-        public static async Task<List<CssUsingDataModel>> AnalyzePage(CssAnalyzeOptions options)
+        private readonly ILogger<CssAnalyzer> _logger;
+
+        public CssAnalyzer(ILogger<CssAnalyzer> logger)
+        {
+            _logger = logger;
+        }
+        public async Task<List<CssUsingDataModel>> AnalyzePage(CssAnalyzeOptions options)
         {
 			IConfiguration config = Configuration.Default.WithDefaultLoader(new LoaderOptions { IsResourceLoadingEnabled = true}).WithCss();
 			IBrowsingContext context = BrowsingContext.New(config);
-			IDocument document = await context.OpenAsync(options.PageUrl);
+			IDocument document = await context.OpenAsync(options.PageUrl);          
 
             IEnumerable<IStyleSheet> sheets;
             List<CssUsingDataModel> cssUsingDataModels = new List<CssUsingDataModel>();
@@ -34,16 +41,16 @@ namespace CssOptimizerU
                 sheets = GetAllCssFiles(document).Where(p => options.CssProcessFileNames.All(fileName => p.Href.Contains(fileName)));
             }
 
-            Console.WriteLine("All process css files on the page:\n");
+            _logger.LogDebug("All process css files on the page:\n");
 
             foreach (var styleSheet in sheets)
             {
-                Console.WriteLine(styleSheet.Href);
+                _logger.LogDebug($"{styleSheet.Href}\n");
             }
 
             if (!sheets.Any())
             {
-                Console.WriteLine("sheet is empty");
+                _logger.LogError("sheet is empty");
                 return cssUsingDataModels;
             }
 
@@ -53,16 +60,13 @@ namespace CssOptimizerU
             {
                 CssUsingDataModel cssUsingData = new CssUsingDataModel();
 
-                Console.WriteLine();
-                Console.WriteLine("+++++++++++++++++ Analyze general.css ++++++++++++++++++++++++++++++++++ :\n");
+				_logger.LogDebug("+++++++++++++++++ Analyze general.css ++++++++++++++++++++++++++++++++++ :\n");
 
                 var docStyleData = await AnalyzeDocStyles(sheet);
 
                 Match match = reg.Match(sheet.Href);
 
-
                 docStyleData.FileName = match.Success ? match.Groups[1].Value : sheet.Href;
-
                 cssUsingData.PageUrl = options.PageUrl;
                 cssUsingData.DocStyles.Add(docStyleData);
                 cssUsingData = CollectUsageStatistic(document, cssUsingData);
@@ -72,9 +76,8 @@ namespace CssOptimizerU
 
             return cssUsingDataModels;
         }
-        private static IEnumerable<IStyleSheet> GetAllCssFiles(IDocument document)
+        private IEnumerable<IStyleSheet> GetAllCssFiles(IDocument document)
         {
-
             List<IStyleSheet> sheets = new List<IStyleSheet>();
             var links = document.QuerySelectorAll("link[rel=stylesheet]");
 
@@ -90,16 +93,14 @@ namespace CssOptimizerU
 
             return sheets;
         }
-
-        private static async Task<DocStyle> AnalyzeDocStyles(IStyleSheet sheet)
+        private async Task<DocStyle> AnalyzeDocStyles(IStyleSheet sheet)
         {
             DocStyle docStyleData = new DocStyle();
-            Console.WriteLine();
-            Console.WriteLine();
-
+          
             if (sheet == null)
             {
-                throw new Exception("sheet is null");
+               _logger.LogError("sheet is null throw exception");
+			   throw new Exception("sheet is null");
             }
 
             CssParser cssParser = new CssParser();
@@ -107,25 +108,22 @@ namespace CssOptimizerU
             {
                 var styleCssSheet = await cssParser.ParseStyleSheetAsync(sheet.Source.Text);
 
-                Console.WriteLine("Parse Css: \n");
+              _logger.LogDebug("Parse Css: \n");
                 docStyleData = ProcessRules(styleCssSheet.Rules, docStyleData);
             }
             else
             {
-
-                Console.WriteLine("sheet.Source is null");
+				_logger.LogError($"{sheet.Href}: sheet.Source is null");
             }
 
             return docStyleData;
         }
 
         // TODO: check why conditionText is empty in db
-        private static DocStyle ProcessRules(ICssRuleList rules, DocStyle docStyleData, string conditionText = "")
+        private DocStyle ProcessRules(ICssRuleList rules, DocStyle docStyleData, string conditionText = "")
         {
-
             foreach (var rule in rules)
             {
-
                 if (rule is ICssGroupingRule)
                 {
                     if (rule is ICssSupportsRule) 
@@ -151,12 +149,8 @@ namespace CssOptimizerU
                 }
                 else
                 {
-
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine(rule.Type);
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine(rule.CssText);
-
+					_logger.LogDebug(rule.Type.ToString());
+					_logger.LogDebug(rule.CssText);
 
 					if (rule is ICssStyleRule cssStyleRule)
                     {
@@ -175,7 +169,7 @@ namespace CssOptimizerU
 
             return docStyleData;
         }
-        private static CssUsingDataModel CollectUsageStatistic(IDocument document, CssUsingDataModel cssUsingDataModel)
+        private CssUsingDataModel CollectUsageStatistic(IDocument document, CssUsingDataModel cssUsingDataModel)
         {
 
             foreach (var docStyle in cssUsingDataModel.DocStyles)
@@ -198,30 +192,21 @@ namespace CssOptimizerU
                     // TODO there are extra cases svg:not(:root) audio:not([controls]) a[href^=\"javascript:\"]:after we count it used now
                     try
                     {
-
                         usingCount = document.QuerySelectorAll(selectorName).Length;
-
                     }
                     catch (Exception)
                     {
-                        Console.WriteLine($"Wrong tag after parsing: {selector.Name} {selectorName}");
+                        _logger.LogDebug($"Wrong tag after parsing: {selector.Name} {selectorName}");
                         usingCount = 1;
                     }
 
                     if (usingCount > 0)
                     {
-                        Console.ForegroundColor = ConsoleColor.Yellow;
                         usageDocStyle.Selectors.ToList().Add(selector);
                         selector.IsUsed = true;
-
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.Gray;
                     }
 
-                    Console.WriteLine($"count elements by query for selector: {selector.Name} -  {usingCount}");
-
+					_logger.LogDebug($"count elements by query for selector: {selector.Name} -  {usingCount}");
                 }
 
                 if (usageDocStyle.Selectors.Any())
@@ -229,7 +214,6 @@ namespace CssOptimizerU
                     usageDocStyle.FileName = docStyle.FileName;
                     cssUsingDataModel.UsageStyles.ToList().Add(usageDocStyle);
                 }
-
             }
 
             return cssUsingDataModel;
